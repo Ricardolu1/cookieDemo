@@ -29,12 +29,34 @@ var server = http.createServer(function(request, response) {
     response.setHeader("Content-Type", "text/html;charset=utf-8")
     response.write(string)
     response.end()
-  }else if (path==='/sign_up') {
+  }else if (path==='/sign_up'&&method==='GET') {
     let string = fs.readFileSync('./sign_up.html','utf-8')
     response.statusCode=200
     response.setHeader('Content-Type','text/html; charset=utf-8')
     response.write(string)
     response.end()  //这是一个路由
+  }else if (path==='/sign_up'&&method==='POST') {
+      readBody(request).then((body)=>{
+        let strings=body.split('&')//返回一个数组
+        let hash={}
+        strings.forEach((string)=>{
+          let parts=string.split('=')
+          let key=parts[0]
+          let value = parts[1]
+          hash[key]=value   //hash['email']='1'
+        })
+        let {email,password,password_confirmation}=hash
+        if (email.indexOf('@')===1) {
+          response.statusCode=400
+          response,write('email in error')
+        }else if (password!==password_confirmation) {
+          response.statusCode=400
+          response.write('password not match')
+        }else {
+          response.statusCode=200
+        }
+        response.end() 
+      })
   }else if (path === "/main.js") {
     let string = fs.readFileSync("./main.js", "utf-8")
     response.statusCode = 200
@@ -77,3 +99,17 @@ console.log(
     " 成功\n请用在空中转体720度然后用电饭煲打开 http://localhost:" +
     port
 )
+
+
+
+function readBody(request) {
+  return new Promise((reslove,reject)=>{
+    let body=[]
+    request.on('data',(chunk)=>{
+      body.push(chunk)
+    }).on('end',()=>{
+      body=Buffer.concat(body).toString()
+      reslove(body)
+    })
+  })
+}

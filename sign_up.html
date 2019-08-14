@@ -75,7 +75,7 @@
 
         $.post("/sign_up",hash)
           .then(
-          ()=>{console.log('success')
+          (e2)=>{console.log(e2)//这个函数的第一个参数是响应返回的东西
         },
           ()=>{console.log('failed')
         })
