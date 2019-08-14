@@ -21,7 +21,8 @@
       .form-wrapper{
         padding:20px;
         border: 1px solid #ddd;
-        box-shadow: 0 0 2px rgba(0,0,0,0.5)
+        box-shadow: 0 0 2px rgba(0,0,0,0.5);
+        min-width: 344px;
       }
       .form-wrapper .row{
         margin:10px 0;
@@ -33,7 +34,10 @@
       .form-wrapper .row >.zhuce{
         position: relative;
         left:199px;
-
+      }
+      .form-wrapper .row >span{
+        color:red;
+        font-size: .7em;
       }
     </style>
   </head>
@@ -45,14 +49,17 @@
         <div class="row">
           <label>邮箱</label>
           <input type="text" name="email" />
+          <span class="error"></span>
         </div>
         <div class="row">
           <label>密码</label>
           <input type="password" name="password" />
+          <span class="error"></span>
         </div>
         <div class="row">
           <label>确认密码</label>
           <input type="password" name="password_confirmation" />
+          <span class="error"></span>
         </div>
         <div class="row">
           <input class="zhuce"type="submit" value="注册" />
@@ -63,23 +70,30 @@
     
     <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
     <script>
-      
-      $('#signUpForm').on('submit',(e)=>{
+      let $form=$('#signUpForm')
+      $form.on('submit',(e)=>{
         e.preventDefault()
         let hash={}
         let need=["email","password","password_confirmation"]
         need.forEach((name)=>{
-          let value= $('#signUpForm').find(`[name=${name}]`).val()
+          let value= $form.find(`[name=${name}]`).val()
           hash[name]=value
         })
-
+        if(hash.email===''){
+          $form.find('[name="email"]').siblings('.error').text('邮箱不能为空')
+        }
         $.post("/sign_up",hash)
           .then(
-          (e2)=>{console.log(e2)//这个函数的第一个参数是响应返回的东西
+          (e2)=>{//console.log(e2)//这个函数的第一个参数是响应返回的东西
         },
-          ()=>{console.log('failed')
+          (request)=>{
+            let{errors}=request.responseJSON
+            console.log(errors)
+            if(errors.email&&errors.email==='invalid'){
+              $form.find('[name="email"]').siblings('.error').text('邮箱格式错误')
+            }
+          })
         })
-      })
 
     </script>
   </body>

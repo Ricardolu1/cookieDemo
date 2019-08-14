@@ -46,9 +46,15 @@ var server = http.createServer(function(request, response) {
           hash[key]=value   //hash['email']='1'
         })
         let {email,password,password_confirmation}=hash
-        if (email.indexOf('@')===1) {
+        if (email.indexOf('@')===-1) {
           response.statusCode=400
-          response,write('email in error')
+          response.setHeader("Content-Type", "application/json;charset=utf-8")
+          response.write(`
+          {
+            "errors":{
+              "email":"invalid"
+            }
+          }`)
         }else if (password!==password_confirmation) {
           response.statusCode=400
           response.write('password not match')
