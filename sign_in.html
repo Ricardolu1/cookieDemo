@@ -91,16 +91,13 @@
 
         $.post("/sign_in",hash)
           .then(
-          (e2)=>{//console.log(e2)//这个函数的第一个参数是响应返回的东西
+          (response)=>{
+            window.location.href='/'
         },
           (request)=>{
-            let{errors}=request.responseJSON
-            console.log(errors)
-            if(errors.email&&errors.email==='invalid'){
-              $form.find('[name="email"]').siblings('.error').text('邮箱格式错误')
-            }
-          })
+            alert('邮箱与密码不匹配')
         })
+      })
 
     </script>
   </body>
