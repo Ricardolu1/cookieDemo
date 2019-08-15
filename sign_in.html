@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>注册</title>
+    <title>登录</title>
     <style>
       * {
         margin: 0;
@@ -31,7 +31,7 @@
         display: inline-block;
         min-width:4em;
       }
-      .form-wrapper .row >.zhuce{
+      .form-wrapper .row >.denglu{
         position: relative;
         left:199px;
       }
@@ -44,8 +44,8 @@
   <body>
 
     <div class="form-wrapper">
-      <h1>注册</h1>
-      <form id="signUpForm">
+      <h1>登录</h1>
+      <form id="signInForm">
         <div class="row">
           <label>邮箱</label>
           <input type="text" name="email" />
@@ -57,12 +57,7 @@
           <span class="error"></span>
         </div>
         <div class="row">
-          <label>确认密码</label>
-          <input type="password" name="password_confirmation" />
-          <span class="error"></span>
-        </div>
-        <div class="row">
-          <input class="zhuce"type="submit" value="注册" />
+          <input class="denglu"type="submit" value="登录" />
         </div>
       </form>
     </div>
@@ -70,11 +65,11 @@
     
     <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
     <script>
-      let $form=$('#signUpForm')
+      let $form=$('#signInForm')
       $form.on('submit',(e)=>{
         e.preventDefault()
         let hash={}
-        let need=["email","password","password_confirmation"]
+        let need=["email","password"]
         need.forEach((name)=>{
           let value= $form.find(`[name=${name}]`).val()
           hash[name]=value
@@ -92,17 +87,9 @@
           $form.find('[name="password"]').siblings('.error')     .text('密码不能为空')
           return
         }
-        if(hash['password_confirmation']===''){
-          $form.find('[name="password_confirmation"]').siblings('.error')     .text('要确认密码哟')
-          return
-        }
 
-        if(hash['password']!==hash['password_confirmation']){
-          $form.find('[name="password_confirmation"]').siblings('.error')     .text('密码不匹配')
-          return
-        }
 
-        $.post("/sign_up",hash)
+        $.post("/sign_in",hash)
           .then(
           (e2)=>{//console.log(e2)//这个函数的第一个参数是响应返回的东西
         },

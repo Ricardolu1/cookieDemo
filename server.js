@@ -43,7 +43,7 @@ var server = http.createServer(function(request, response) {
           let parts=string.split('=')
           let key=parts[0]
           let value = parts[1]
-          hash[key]=decodeURLComponent(value)  //hash['email']='1'
+          hash[key]=decodeURIComponent(value)  //hash['email']='1'
         })
         let {email,password,password_confirmation}=hash
         if (email.indexOf('@')===-1) {
@@ -60,13 +60,56 @@ var server = http.createServer(function(request, response) {
           response.write('password not match')
         }else {
           let users =fs.readFileSync('./db/users','utf8')
-          users=JSON.parse(users)
-          users.push({email:email,password:password})
-          response.statusCode=200
+          try {
+            users=JSON.parse(users)
+          } catch (exception) {
+            users=[]
+          }
+          let inUse=false
+          for (let i = 0; i < users.length; i++) {
+            let user = users[i];
+            if (user.email===email) {
+              inUse=true
+              break;
+            }
+          }
+          if (inUse) {
+            response.statusCode=400
+            response.write('email in use')
+          }else {
+            users.push({email:email,password:password})
+            let usersString = JSON.stringify(users)
+            console.log(usersString)
+            fs.writeFileSync('./db/users',usersString)
+            response.statusCode=200
+          }
         }
         response.end() 
       })
-  }else if (path === "/main.js") {
+  } else if (path==='/sign_in'&&method==='GET') {
+    let string = fs.readFileSync('./sign_in.html','utf-8')
+    response.statusCode=200
+    response.setHeader('Content-Type','text/html; charset=utf-8')
+    response.write(string)
+    response.end()  //这是一个路由
+  } else if (path==='/sign_in'&&method==='POST') {
+    readBody(request).then((body)=>{
+      let strings=body.split('&')//返回一个数组
+      let hash={}
+      strings.forEach((string)=>{
+        let parts=string.split('=')
+        let key=parts[0]
+        let value = parts[1]
+        hash[key]=decodeURIComponent(value)  //hash['email']='1'
+      })
+      let {email,password}=hash
+      console.log('email')
+      console.log(email)
+      console.log('password')
+      console.log(password)
+    })
+    response.end()
+  } else if (path === "/main.js") {
     let string = fs.readFileSync("./main.js", "utf-8")
     response.statusCode = 200
     response.setHeader("Content-Type", "text/javascript;charset=utf-8")
