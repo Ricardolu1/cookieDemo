@@ -43,7 +43,7 @@ var server = http.createServer(function(request, response) {
           let parts=string.split('=')
           let key=parts[0]
           let value = parts[1]
-          hash[key]=value   //hash['email']='1'
+          hash[key]=decodeURLComponent(value)  //hash['email']='1'
         })
         let {email,password,password_confirmation}=hash
         if (email.indexOf('@')===-1) {
@@ -59,6 +59,9 @@ var server = http.createServer(function(request, response) {
           response.statusCode=400
           response.write('password not match')
         }else {
+          let users =fs.readFileSync('./db/users','utf8')
+          users=JSON.parse(users)
+          users.push({email:email,password:password})
           response.statusCode=200
         }
         response.end() 
