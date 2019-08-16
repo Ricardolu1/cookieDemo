@@ -25,6 +25,24 @@ var server = http.createServer(function(request, response) {
 
   if (path === "/") {
     let string = fs.readFileSync("./index.html", "utf-8")
+    // let users =fs.readFileSync('./db/users','utf8')
+    // try {
+    //   users=JSON.parse(users)
+    // } catch (exception) {
+    //   users=[]
+    // }
+    console.log('request.headers.cookie')
+    console.log(request.headers.cookie)
+    let cookies=request.headers.cookie.split('; ')//得到一个有三个字符串的数组 ['enail=1@','a=1','b=2']
+    let hash ={}
+
+    for (let i = 0; i < cookies.length; i++) {
+      let parts = cookies[i].split('=');
+      let key =parts[0]
+      let value =parts[1]
+      hash[key]=value
+    }
+    console.log(hash)
     response.statusCode = 200
     response.setHeader("Content-Type", "text/html;charset=utf-8")
     response.write(string)
@@ -121,7 +139,7 @@ var server = http.createServer(function(request, response) {
           }
         }
         if (found) {
-          response.setHeader(`Set-Cookie: sign_in_email=${email}`)
+          response.setHeader('Set-Cookie', `sign_in_email=${email};HttpOnly`)
           response.statusCode=200
         }else {
           response.statusCode=401
