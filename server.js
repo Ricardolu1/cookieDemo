@@ -25,12 +25,7 @@ var server = http.createServer(function(request, response) {
 
   if (path === "/") {
     let string = fs.readFileSync("./index.html", "utf-8")
-    // let users =fs.readFileSync('./db/users','utf8')
-    // try {
-    //   users=JSON.parse(users)
-    // } catch (exception) {
-    //   users=[]
-    // }
+    console.log(string)
     console.log('request.headers.cookie')
     console.log(request.headers.cookie)
     let cookies=request.headers.cookie.split('; ')//得到一个有三个字符串的数组 ['enail=1@','a=1','b=2']
@@ -42,7 +37,25 @@ var server = http.createServer(function(request, response) {
       let value =parts[1]
       hash[key]=value
     }
-    console.log(hash)
+    let email =hash.sign_in_email
+    let users =fs.readFileSync('./db/users','utf8')
+    try {
+      users=JSON.parse(users)
+    } catch (exception) {
+      users=[]
+    }
+    let foundUser
+    for (let i = 0; i < users.length; i++) {
+      if (users[i].email===email) {
+        foundUser =users[i] //数组里面存的对象
+        break
+      }
+    }
+    if (foundUser) {
+      string=string.replace('__password__',foundUser.password)
+    }else {
+      string= string.replace('__password__','不知道')
+    }
     response.statusCode = 200
     response.setHeader("Content-Type", "text/html;charset=utf-8")
     response.write(string)
