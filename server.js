@@ -7,6 +7,9 @@ if (!port) {
   console.log("请指定端口号好不啦？\nnode server.js 8888 这样不会吗？")
   process.exit(1)
 }
+let sessions={
+
+}
 
 var server = http.createServer(function(request, response) {
   var parsedUrl = url.parse(request.url, true)
@@ -25,19 +28,26 @@ var server = http.createServer(function(request, response) {
 
   if (path === "/") {
     let string = fs.readFileSync("./index.html", "utf-8")
-    console.log(string)
     console.log('request.headers.cookie')
     console.log(request.headers.cookie)
-    let cookies=request.headers.cookie.split('; ')//得到一个有三个字符串的数组 ['enail=1@','a=1','b=2']
+    let cookies=''
+    if (request.headers.cookie) {
+      cookies=request.headers.cookie.split('; ')
+    }
+    //得到一个有三个字符串的数组 ['enail=1@','a=1','b=2']
     let hash ={}
-
     for (let i = 0; i < cookies.length; i++) {
       let parts = cookies[i].split('=');
       let key =parts[0]
       let value =parts[1]
       hash[key]=value
     }
-    let email =hash.sign_in_email
+    console.log(hash)
+    let mySession =sessions[hash.sessionsId]//这个hash.sessionsId是一个随机数
+    let email
+    if (mySession) {
+      email=mySession.sign_in_email
+    }
     let users =fs.readFileSync('./db/users','utf8')
     try {
       users=JSON.parse(users)
@@ -123,7 +133,7 @@ var server = http.createServer(function(request, response) {
     response.setHeader('Content-Type','text/html; charset=utf-8')
     response.write(string)
     response.end()  //这是一个路由
-  } else if (path==='/sign_in'&&method==='POST') {
+  } else if (path==='/sign_in'&&method==='POST') {//登录
     readBody(request).then((body)=>{
       let strings=body.split('&')//返回一个数组
       let hash={}
@@ -152,7 +162,9 @@ var server = http.createServer(function(request, response) {
           }
         }
         if (found) {
-          response.setHeader('Set-Cookie', `sign_in_email=${email};HttpOnly`)
+          let sessionsId =Math.random()*100000
+          sessions[sessionsId]={sign_in_email:email}
+          response.setHeader('Set-Cookie', `sessionsId=${sessionsId}`)
           response.statusCode=200
         }else {
           response.statusCode=401
