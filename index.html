@@ -8,5 +8,18 @@
 </head>
 <body>
   <h1>你的密码是:__password__</h1>
+  <script>
+   let a= localStorage.getItem('a')
+
+    if (!a) {
+      a=0
+    }else{
+      a=(+a)+1
+    }
+    console.log('a')
+    console.log(a)
+    localStorage.setItem('a', a)
+    
+  </script>
 </body>
 </html>
