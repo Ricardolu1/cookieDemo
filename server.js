@@ -25,8 +25,19 @@ var server = http.createServer(function(request, response) {
   /******** 从这里开始看，上面不要看 ************/
 
   console.log("含查询字符串的路径\n" + pathWithQuery)
-
-  if (path === "/") {
+  if (path==='/js/main.js') {
+    let string =fs.readFileSync('./js/main.js','utf8')
+    response.setHeader('Content-Type','application/javascript;charset=uft8')
+    response.setHeader('Cache-Control','max-age=30')
+    response.write(string)
+    response.end()
+  }else if (path==='/css/default.css') {
+    let string =fs.readFileSync('./css/default.css','utf8')
+    response.setHeader('Content-Type','text/css;charset=uft8')
+    response.setHeader('Cache-Control','max-age=30')
+    response.write(string)
+    response.end()
+  }else if (path === "/") {
     let string = fs.readFileSync("./index.html", "utf-8")
     console.log('request.headers.cookie')
     console.log(request.headers.cookie)
