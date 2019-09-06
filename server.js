@@ -2,6 +2,7 @@ var http = require("http")
 var fs = require("fs")
 var url = require("url")
 var port = process.argv[2]
+var md5 = require('md5');
 
 if (!port) {
   console.log("请指定端口号好不啦？\nnode server.js 8888 这样不会吗？")
@@ -28,13 +29,19 @@ var server = http.createServer(function(request, response) {
   if (path==='/js/main.js') {
     let string =fs.readFileSync('./js/main.js','utf8')
     response.setHeader('Content-Type','application/javascript;charset=uft8')
-    response.setHeader('Cache-Control','max-age=30')
-    response.write(string)
+    let fileMd5=md5(string)
+    response.setHeader('ETag',fileMd5)
+    if (request.headers['if-none-match']===fileMd5) {
+      response.statusCode=304
+    }else {
+      // response.setHeader('Cache-Control','max-age=30000000000')
+      response.write(string)
+    }
     response.end()
   }else if (path==='/css/default.css') {
     let string =fs.readFileSync('./css/default.css','utf8')
     response.setHeader('Content-Type','text/css;charset=uft8')
-    response.setHeader('Cache-Control','max-age=30')
+    response.setHeader('Cache-Control','max-age=30000000000')
     response.write(string)
     response.end()
   }else if (path === "/") {
